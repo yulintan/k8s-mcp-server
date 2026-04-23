@@ -12,6 +12,8 @@ import (
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o k8sfakes/fake_client_manager.go --fake-name FakeClientManager . ClientManager
+
 // ClientManager provides Kubernetes clients per kubeconfig context.
 type ClientManager interface {
 	GetClient(contextName string) (kubernetes.Interface, error)
