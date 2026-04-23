@@ -1,17 +1,17 @@
 # k8s-mcp-server
 
-An MCP server that lets Claude Desktop and other MCP clients use Kubernetes tools directly.
+An MCP server that lets Codex, Claude Desktop, and other MCP clients use Kubernetes tools directly.
 
 ## Quick Start For Users
 
-If you want Claude Desktop to help inspect or operate your cluster, this is the setup flow:
+If you want Codex or Claude Desktop to help inspect or operate your cluster, this is the setup flow:
 
 1. Build the binary.
-2. Register it in Claude Desktop as an MCP server.
-3. Restart Claude Desktop.
-4. Ask Claude Kubernetes questions in natural language.
+2. Register it in your MCP client.
+3. Restart the client if needed.
+4. Ask Kubernetes questions in natural language.
 
-You do not manually call MCP methods yourself. Claude discovers the available tools automatically and chooses which one to use based on your prompt.
+You do not manually call MCP methods yourself. The client discovers the available tools automatically and chooses which one to use based on your prompt.
 
 ## Requirements
 
@@ -32,7 +32,49 @@ This creates:
 ./k8s-mcp-server
 ```
 
-## 2. Connect It To Claude Desktop
+## 2. Connect It To Codex
+
+Codex can launch this server in `stdio` mode.
+
+Add this to your Codex config:
+
+`~/.codex/config.toml`
+
+```toml
+[mcp_servers.k8s]
+command = "go"
+args = ["run", "/absolute/path/to/k8s-mcp-server"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+```
+
+If you prefer running a built binary instead:
+
+```toml
+[mcp_servers.k8s]
+command = "/absolute/path/to/k8s-mcp-server/k8s-mcp-server"
+args = []
+startup_timeout_sec = 15
+tool_timeout_sec = 120
+```
+
+If you want to force a specific kubeconfig, add an env var or pass the flag as args. For example:
+
+```toml
+[mcp_servers.k8s]
+command = "/absolute/path/to/k8s-mcp-server/k8s-mcp-server"
+args = ["--kubeconfig", "/Users/you/.kube/config"]
+startup_timeout_sec = 15
+tool_timeout_sec = 120
+```
+
+Then start a new Codex session in the project and confirm the MCP server is available:
+
+```bash
+codex mcp list
+```
+
+## 3. Connect It To Claude Desktop
 
 Claude Desktop should launch this server in `stdio` mode. You do not need to run `go run main.go` yourself for that setup.
 
@@ -68,9 +110,9 @@ If you want to force a specific kubeconfig:
 
 Then restart Claude Desktop.
 
-## 3. Start Using It
+## 4. Start Using It
 
-Once Claude Desktop restarts, you can ask things like:
+Once Codex or Claude Desktop sees the server, you can ask things like:
 
 - `List my Kubernetes contexts`
 - `Show pods in the default namespace`
@@ -79,11 +121,11 @@ Once Claude Desktop restarts, you can ask things like:
 - `Show me all nodes and their status`
 - `Get the deployment my-api in namespace prod`
 
-Claude will inspect the tool list exposed by this server and choose the right tool automatically.
+The client will inspect the tool list exposed by this server and choose the right tool automatically.
 
 ## Demo Prompts
 
-Here are practical examples of what you can ask Claude once this server is connected.
+Here are practical examples of what you can ask once this server is connected.
 
 ### Cluster Discovery
 
@@ -95,9 +137,9 @@ Use prompts like:
 
 Typical outcomes:
 
-- Claude shows the current kubeconfig context
-- Claude lists namespaces with age and status
-- Claude summarizes node readiness, roles, version, and internal IP
+- Codex or Claude shows the current kubeconfig context
+- Codex or Claude lists namespaces with age and status
+- Codex or Claude summarizes node readiness, roles, version, and internal IP
 
 ### Pod Investigation
 
@@ -110,10 +152,10 @@ Use prompts like:
 
 Typical outcomes:
 
-- Claude lists matching pods
-- Claude inspects a pod's status, node, IP, labels, containers, and conditions
-- Claude fetches logs from the selected container
-- Claude surfaces recent warning events for troubleshooting
+- Codex or Claude lists matching pods
+- Codex or Claude inspects a pod's status, node, IP, labels, containers, and conditions
+- Codex or Claude fetches logs from the selected container
+- Codex or Claude surfaces recent warning events for troubleshooting
 
 ### Resource Lookup
 
@@ -125,9 +167,9 @@ Use prompts like:
 
 Typical outcomes:
 
-- Claude maps your request to `apiVersion` and `kind`
-- Claude lists matching resources
-- Claude returns the full JSON for a specific resource when needed
+- Codex or Claude maps your request to `apiVersion` and `kind`
+- Codex or Claude lists matching resources
+- Codex or Claude returns the full JSON for a specific resource when needed
 
 ### Exec And Debug Workflows
 
@@ -139,9 +181,9 @@ Use prompts like:
 
 Typical outcomes:
 
-- Claude executes a command inside a pod and returns stdout and stderr
-- Claude creates a temporary debug pod for investigation
-- Claude deletes the pod when requested
+- Codex or Claude executes a command inside a pod and returns stdout and stderr
+- Codex or Claude creates a temporary debug pod for investigation
+- Codex or Claude deletes the pod when requested
 
 ### Bulk Operations
 
@@ -153,7 +195,7 @@ Use prompts like:
 
 Typical outcomes:
 
-- Claude uses the bulk tools instead of making many small sequential calls
+- Codex or Claude uses the bulk tools instead of making many small sequential calls
 - Results are grouped by namespace, context, or target pod
 
 ## What Users Can Ask For
@@ -192,7 +234,7 @@ Current tool names:
 
 ## Other Run Modes
 
-If you are not using Claude Desktop and need an HTTP endpoint instead, run SSE mode:
+If you are not using a local `stdio` MCP client and need an HTTP endpoint instead, run SSE mode:
 
 ```bash
 go run main.go --port 8080
@@ -218,8 +260,9 @@ make run-stdio
 
 ## Troubleshooting
 
+- If Codex does not see the server, confirm the entry in `~/.codex/config.toml` is correct and start a new Codex session.
 - If Claude Desktop does not see the server, confirm the binary path in `claude_desktop_config.json` is correct.
-- If Claude starts the server but tools fail, verify your kubeconfig works and points at the cluster you expect.
+- If the client starts the server but tools fail, verify your kubeconfig works and points at the cluster you expect.
 - If `ginkgo` is not found, ensure `$(go env GOPATH)/bin` is on your `PATH`.
 - In `stdio` mode, logs are written to `stderr`.
 
