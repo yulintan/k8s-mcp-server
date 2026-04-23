@@ -32,9 +32,11 @@ This creates:
 ./k8s-mcp-server
 ```
 
-## 2. Connect It To Codex
+## 2. Connect It To An LLM Client
 
-Codex can launch this server in `stdio` mode.
+This server is designed for MCP clients that launch local tools in `stdio` mode.
+
+### Codex
 
 Add this to your Codex config:
 
@@ -58,7 +60,7 @@ startup_timeout_sec = 15
 tool_timeout_sec = 120
 ```
 
-If you want to force a specific kubeconfig, add an env var or pass the flag as args. For example:
+If you want to force a specific kubeconfig, pass the flag as args. For example:
 
 ```toml
 [mcp_servers.k8s]
@@ -74,7 +76,7 @@ Then start a new Codex session in the project and confirm the MCP server is avai
 codex mcp list
 ```
 
-## 3. Connect It To Claude Desktop
+### Claude Desktop
 
 Claude Desktop should launch this server in `stdio` mode. You do not need to run `go run main.go` yourself for that setup.
 
@@ -110,7 +112,7 @@ If you want to force a specific kubeconfig:
 
 Then restart Claude Desktop.
 
-## 4. Start Using It
+## 3. Start Using It
 
 Once Codex or Claude Desktop sees the server, you can ask things like:
 
