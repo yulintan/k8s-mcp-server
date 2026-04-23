@@ -26,6 +26,23 @@ I chose this project because it is directly relevant to DevOps / SRE-style work:
 
 It also gives me a concrete way to demonstrate AI-assisted engineering on top of a real infrastructure-oriented problem rather than a toy demo.
 
+## Practical Advantages
+
+This project is useful for real multi-cluster operations.
+
+- it supports bulk operations across many contexts and namespaces
+- it uses Go concurrency to fan out work efficiently
+- it gives an MCP client one interface for querying many clusters
+
+This matters in environments with a large fleet of Kubernetes clusters. For example, if I manage more than 100 clusters, I may want to check:
+
+- whether all clusters can pull from a private container registry
+- whether all clusters can reach a private metrics endpoint such as VictoriaMetrics
+- whether a debugging pod can be created consistently across selected clusters
+- whether the same validation or diagnostic command succeeds everywhere
+
+Instead of checking clusters one by one, this server can execute those workflows in parallel and return grouped results. That makes it a good fit for SRE-style automation and operational verification at scale.
+
 ## Development Environment
 
 Primary development interface:
