@@ -120,9 +120,9 @@ This repository now includes a workspace skill here:
 
 `skills/k8s-mcp-server/SKILL.md`
 
-OpenClaw docs say workspace skills are loaded from `<workspace>/skills`, so if you open this repository as your OpenClaw workspace, the skill is available automatically.
+Open this repository as your OpenClaw workspace and the skill will load automatically from `skills/`.
 
-The skill teaches OpenClaw when to use this Kubernetes MCP server and how to register it as `k8s`.
+The skill tells OpenClaw when to use this Kubernetes MCP server and how to register it as `k8s`.
 
 For this server, the simplest OpenClaw transport is local `stdio`. A typical registration looks like:
 
