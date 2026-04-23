@@ -52,7 +52,7 @@ I used Claude Code as the primary interface for:
 - validating request / response flows for SSE-based MCP communication
 - tightening documentation and interview-facing explanations
 
-I did not treat AI output as final by default. I used it as a fast implementation and reasoning partner, then verified the code manually.
+I used AI as an implementation partner, not as an autopilot. I reviewed the generated code, tested it, and adjusted it when needed.
 
 ## Typical Workflow
 
@@ -91,12 +91,3 @@ AI was most useful for:
 - generating first-pass tests and fake wiring
 - comparing transport / protocol concepts quickly while I refined the design
 - helping turn implementation work into clearer documentation and interview-ready explanations
-
-## What I Still Evaluated Manually
-
-The most important manual checks were:
-
-- whether the abstraction boundary was correct
-- whether tests were verifying the right layer
-- whether Kubernetes client behavior was real or only fake-client behavior
-- whether the design was appropriate for an ops-focused system rather than just “working code”
