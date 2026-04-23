@@ -112,6 +112,50 @@ If you want to force a specific kubeconfig:
 
 Then restart Claude Desktop.
 
+### OpenClaw
+
+OpenClaw supports both workspace skills and saved outbound MCP server definitions.
+
+This repository now includes a workspace skill here:
+
+`skills/k8s-mcp-server/SKILL.md`
+
+OpenClaw docs say workspace skills are loaded from `<workspace>/skills`, so if you open this repository as your OpenClaw workspace, the skill is available automatically.
+
+The skill teaches OpenClaw when to use this Kubernetes MCP server and how to register it as `k8s`.
+
+For this server, the simplest OpenClaw transport is local `stdio`. A typical registration looks like:
+
+```bash
+openclaw mcp set k8s '{"command":"/absolute/path/to/k8s-mcp-server/k8s-mcp-server","args":[]}'
+```
+
+If you prefer `go run` during development:
+
+```bash
+openclaw mcp set k8s '{"command":"go","args":["run","/absolute/path/to/k8s-mcp-server"]}'
+```
+
+If you want to force a specific kubeconfig:
+
+```bash
+openclaw mcp set k8s '{"command":"/absolute/path/to/k8s-mcp-server/k8s-mcp-server","args":["--kubeconfig","/Users/you/.kube/config"]}'
+```
+
+Confirm the saved definition:
+
+```bash
+openclaw mcp list
+openclaw mcp show k8s
+```
+
+Important notes:
+
+- OpenClaw skills and MCP server definitions are separate things. The skill provides instructions; `openclaw mcp set` stores the actual MCP server definition.
+- `openclaw mcp set` only saves config. It does not validate that the server starts successfully.
+- This project is a local MCP server, so `stdio` is the expected OpenClaw transport unless you intentionally run this server in HTTP mode.
+- If you run this project in SSE mode, OpenClaw also documents remote HTTP-based MCP definitions, but whether a given OpenClaw runtime consumes that definition depends on the runtime adapter you use.
+
 ## 3. Start Using It
 
 Once Codex or Claude Desktop sees the server, you can ask things like:
