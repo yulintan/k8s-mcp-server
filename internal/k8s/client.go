@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -18,6 +19,7 @@ import (
 type ClientManager interface {
 	GetClient(contextName string) (kubernetes.Interface, error)
 	GetDynamicClient(contextName string) (dynamic.Interface, error)
+	GetDiscoveryClient(contextName string) (discovery.DiscoveryInterface, error)
 	GetRESTConfig(contextName string) (*rest.Config, error)
 	RawConfig() (clientcmdapi.Config, error)
 	CurrentContext() (string, error)
@@ -31,6 +33,7 @@ type ClientManager interface {
 type clientEntry struct {
 	typed   kubernetes.Interface
 	dynamic dynamic.Interface
+	disco   discovery.DiscoveryInterface
 	rest    *rest.Config
 }
 
@@ -93,8 +96,12 @@ func (m *clientManager) getOrCreate(contextName string) (*clientEntry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("creating dynamic client for context %q: %w", resolved, err)
 	}
+	disco, err := discovery.NewDiscoveryClientForConfig(restCfg)
+	if err != nil {
+		return nil, fmt.Errorf("creating discovery client for context %q: %w", resolved, err)
+	}
 
-	entry = &clientEntry{typed: typed, dynamic: dyn, rest: restCfg}
+	entry = &clientEntry{typed: typed, dynamic: dyn, disco: disco, rest: restCfg}
 	m.cache[resolved] = entry
 	return entry, nil
 }
@@ -113,6 +120,14 @@ func (m *clientManager) GetDynamicClient(contextName string) (dynamic.Interface,
 		return nil, err
 	}
 	return e.dynamic, nil
+}
+
+func (m *clientManager) GetDiscoveryClient(contextName string) (discovery.DiscoveryInterface, error) {
+	e, err := m.getOrCreate(contextName)
+	if err != nil {
+		return nil, err
+	}
+	return e.disco, nil
 }
 
 func (m *clientManager) GetRESTConfig(contextName string) (*rest.Config, error) {

@@ -166,6 +166,8 @@ Once Codex or Claude Desktop sees the server, you can ask things like:
 - `List warning events in kube-system`
 - `Show me all nodes and their status`
 - `Get the deployment my-api in namespace prod`
+- `List API resources available in this cluster`
+- `List ingresses in namespace prod`
 
 The client will inspect the tool list exposed by this server and choose the right tool automatically.
 
@@ -209,12 +211,17 @@ Use prompts like:
 
 - `List deployments in namespace prod`
 - `Get deployment my-api in namespace prod`
+- `List services in namespace prod`
+- `List ingresses in namespace prod`
+- `List jobs in namespace batch`
+- `List PVCs in namespace prod`
 - `List configmaps in kube-system`
+- `List API resources available in this cluster`
 
 Typical outcomes:
 
-- Codex or Claude maps your request to `apiVersion` and `kind`
-- Codex or Claude lists matching resources
+- Codex or Claude uses high-level tools for common resources such as deployments, services, ingresses, jobs, and PVCs
+- Codex or Claude can discover available API resources before querying unfamiliar built-in resources or CRDs
 - Codex or Claude returns the full JSON for a specific resource when needed
 
 ### Exec And Debug Workflows
@@ -257,6 +264,8 @@ This server exposes Kubernetes tools for:
 - pod exec
 - debug pod creation and deletion
 - bulk pod operations
+- API resource discovery
+- common resource lookup for deployments, services, ingresses, jobs, and PVCs
 - generic Kubernetes resource lookup by `apiVersion` and `kind`
 
 Current tool names:
@@ -275,6 +284,17 @@ Current tool names:
 - `k8s_pods_list_bulk`
 - `k8s_pods_exec_bulk`
 - `k8s_debug_pods_create_bulk`
+- `k8s_api_resources_list`
+- `k8s_deployments_list`
+- `k8s_deployments_get`
+- `k8s_services_list`
+- `k8s_services_get`
+- `k8s_ingresses_list`
+- `k8s_ingresses_get`
+- `k8s_jobs_list`
+- `k8s_jobs_get`
+- `k8s_pvcs_list`
+- `k8s_pvcs_get`
 - `k8s_resources_list`
 - `k8s_resources_get`
 

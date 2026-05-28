@@ -11,17 +11,21 @@ import (
 	"github.com/yulintan/k8s-mcp-server/internal/k8s"
 	"github.com/yulintan/k8s-mcp-server/internal/k8s/k8sfakes"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/discovery"
+	discoveryfake "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/dynamic"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
 	"k8s.io/client-go/kubernetes"
 	kubernetesfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
+	clientgotesting "k8s.io/client-go/testing"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
 type fakeClientManagerConfig struct {
 	typedClient     kubernetes.Interface
 	dynamicClient   dynamic.Interface
+	discoveryClient discovery.DiscoveryInterface
 	restConfig      *rest.Config
 	rawConfig       clientcmdapi.Config
 	currentCtx      string
@@ -39,6 +43,10 @@ func newFakeClientManager(cfg fakeClientManagerConfig) *k8sfakes.FakeClientManag
 	if dynamicClient == nil {
 		dynamicClient = dynamicfake.NewSimpleDynamicClient(runtime.NewScheme())
 	}
+	discoveryClient := cfg.discoveryClient
+	if discoveryClient == nil {
+		discoveryClient = &discoveryfake.FakeDiscovery{Fake: &clientgotesting.Fake{}}
+	}
 	restConfig := cfg.restConfig
 	if restConfig == nil {
 		restConfig = &rest.Config{}
@@ -51,6 +59,7 @@ func newFakeClientManager(cfg fakeClientManagerConfig) *k8sfakes.FakeClientManag
 	fake := &k8sfakes.FakeClientManager{}
 	fake.GetClientReturns(typedClient, nil)
 	fake.GetDynamicClientReturns(dynamicClient, nil)
+	fake.GetDiscoveryClientReturns(discoveryClient, nil)
 	fake.GetRESTConfigReturns(restConfig, nil)
 	fake.RawConfigReturns(cfg.rawConfig, nil)
 	if currentCtx == "" {
