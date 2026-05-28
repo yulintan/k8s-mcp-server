@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/yulintan/k8s-mcp-server/internal/k8s"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -92,6 +93,19 @@ type FakeClientManager struct {
 	}
 	getDynamicClientReturnsOnCall map[int]struct {
 		result1 dynamic.Interface
+		result2 error
+	}
+	GetDiscoveryClientStub        func(string) (discovery.DiscoveryInterface, error)
+	getDiscoveryClientMutex       sync.RWMutex
+	getDiscoveryClientArgsForCall []struct {
+		arg1 string
+	}
+	getDiscoveryClientReturns struct {
+		result1 discovery.DiscoveryInterface
+		result2 error
+	}
+	getDiscoveryClientReturnsOnCall map[int]struct {
+		result1 discovery.DiscoveryInterface
 		result2 error
 	}
 	GetRESTConfigStub        func(string) (*rest.Config, error)
@@ -521,6 +535,70 @@ func (fake *FakeClientManager) GetDynamicClientReturnsOnCall(i int, result1 dyna
 	}
 	fake.getDynamicClientReturnsOnCall[i] = struct {
 		result1 dynamic.Interface
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClientManager) GetDiscoveryClient(arg1 string) (discovery.DiscoveryInterface, error) {
+	fake.getDiscoveryClientMutex.Lock()
+	ret, specificReturn := fake.getDiscoveryClientReturnsOnCall[len(fake.getDiscoveryClientArgsForCall)]
+	fake.getDiscoveryClientArgsForCall = append(fake.getDiscoveryClientArgsForCall, struct {
+		arg1 string
+	}{arg1})
+	stub := fake.GetDiscoveryClientStub
+	fakeReturns := fake.getDiscoveryClientReturns
+	fake.recordInvocation("GetDiscoveryClient", []interface{}{arg1})
+	fake.getDiscoveryClientMutex.Unlock()
+	if stub != nil {
+		return stub(arg1)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeClientManager) GetDiscoveryClientCallCount() int {
+	fake.getDiscoveryClientMutex.RLock()
+	defer fake.getDiscoveryClientMutex.RUnlock()
+	return len(fake.getDiscoveryClientArgsForCall)
+}
+
+func (fake *FakeClientManager) GetDiscoveryClientCalls(stub func(string) (discovery.DiscoveryInterface, error)) {
+	fake.getDiscoveryClientMutex.Lock()
+	defer fake.getDiscoveryClientMutex.Unlock()
+	fake.GetDiscoveryClientStub = stub
+}
+
+func (fake *FakeClientManager) GetDiscoveryClientArgsForCall(i int) string {
+	fake.getDiscoveryClientMutex.RLock()
+	defer fake.getDiscoveryClientMutex.RUnlock()
+	argsForCall := fake.getDiscoveryClientArgsForCall[i]
+	return argsForCall.arg1
+}
+
+func (fake *FakeClientManager) GetDiscoveryClientReturns(result1 discovery.DiscoveryInterface, result2 error) {
+	fake.getDiscoveryClientMutex.Lock()
+	defer fake.getDiscoveryClientMutex.Unlock()
+	fake.GetDiscoveryClientStub = nil
+	fake.getDiscoveryClientReturns = struct {
+		result1 discovery.DiscoveryInterface
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClientManager) GetDiscoveryClientReturnsOnCall(i int, result1 discovery.DiscoveryInterface, result2 error) {
+	fake.getDiscoveryClientMutex.Lock()
+	defer fake.getDiscoveryClientMutex.Unlock()
+	fake.GetDiscoveryClientStub = nil
+	if fake.getDiscoveryClientReturnsOnCall == nil {
+		fake.getDiscoveryClientReturnsOnCall = make(map[int]struct {
+			result1 discovery.DiscoveryInterface
+			result2 error
+		})
+	}
+	fake.getDiscoveryClientReturnsOnCall[i] = struct {
+		result1 discovery.DiscoveryInterface
 		result2 error
 	}{result1, result2}
 }

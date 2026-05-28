@@ -40,6 +40,17 @@ var _ = Describe("tool registration", func() {
 			"k8s_debug_pods_create_bulk",
 			"k8s_resources_list",
 			"k8s_resources_get",
+			"k8s_api_resources_list",
+			"k8s_deployments_list",
+			"k8s_deployments_get",
+			"k8s_services_list",
+			"k8s_services_get",
+			"k8s_ingresses_list",
+			"k8s_ingresses_get",
+			"k8s_jobs_list",
+			"k8s_jobs_get",
+			"k8s_pvcs_list",
+			"k8s_pvcs_get",
 		))
 	})
 })
