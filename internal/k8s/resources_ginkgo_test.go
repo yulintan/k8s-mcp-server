@@ -5,7 +5,7 @@ import (
 	"k8s.io/client-go/discovery/fake"
 	clientgotesting "k8s.io/client-go/testing"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 

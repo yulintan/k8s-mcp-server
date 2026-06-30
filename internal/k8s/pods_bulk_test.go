@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -76,9 +76,11 @@ var _ = Describe("bulk Kubernetes operations", func() {
 	})
 
 	It("returns exec errors per target without aborting the batch", func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 		mgr := newManager(missingKubeconfig)
 
-		results := mgr.BulkExec(context.Background(), []ExecTarget{
+		results := mgr.BulkExec(ctx, []ExecTarget{
 			{Context: "missing-a", Namespace: "default", PodName: "api-0", Container: "app"},
 			{Context: "missing", Namespace: "default", PodName: "api-1", Container: "app"},
 		}, []string{"echo", "hello"}, 2)
